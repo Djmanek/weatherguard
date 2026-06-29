@@ -52,11 +52,11 @@ export class TelegramService implements OnModuleInit {
         await this.usersService.setTelegramChatId(userId, chatId);
         this.bot.sendMessage(
           chatId,
-          `✅ Your Telegram account is linked to WeatherGuard!\n\nYou'll receive weather alerts here once your access is approved.`,
+          `Your Telegram account is linked to WeatherGuard!\n\nYou'll receive weather alerts here once your access is approved.`,
         );
       } catch (err: any) {
         this.logger.error(`Linking failed: ${err.message}`);
-        this.bot.sendMessage(chatId, '❌ Invalid or expired link token.');
+        this.bot.sendMessage(chatId, 'Invalid or expired link token.');
       }
     });
 
@@ -65,7 +65,7 @@ export class TelegramService implements OnModuleInit {
       this.logger.log(`/start (no token) from chat ${chatId}`);
       this.bot.sendMessage(
         chatId,
-        `👋 Welcome to WeatherGuard Bot!\n\nVisit the WeatherGuard dashboard to link your account and receive weather alerts.`,
+        `Welcome to WeatherGuard Bot!\n\nVisit the WeatherGuard dashboard to link your account and receive weather alerts.`,
       );
     });
 
