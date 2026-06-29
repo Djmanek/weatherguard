@@ -23,14 +23,6 @@ A secure, invite-only weather alert service connecting a React admin dashboard t
 | `avatarUrl` | String \| null | Profile picture from OAuth |
 | `createdAt` | Date | Mongoose timestamp |
 
-**`alert_logs` collection** *(future — for audit trail)*
-
-| Field | Type | Description |
-|---|---|---|
-| `userId` | ObjectId | Ref to users |
-| `message` | String | Alert content sent |
-| `sentAt` | Date | Delivery timestamp |
-
 ---
 
 ## Data Flow
@@ -70,7 +62,7 @@ The gate is enforced at two levels:
 ### Telegram Account Linking
 ```
 User visits /dashboard → GET /users/telegram-link
-  → Returns t.me/weatherguard_bot?start=<base64(userId)>
+  → Returns t.me/weatherguard_dev_bot?start=<base64(userId)>
 User taps link → opens Telegram bot
 Bot receives /start <token>
   → Decodes base64 → userId
@@ -93,7 +85,6 @@ Bot receives /start <token>
 | Frontend | React + Vite + TypeScript |
 | Styling | Tailwind CSS v4 |
 | Data fetching | TanStack Query (React Query) |
-| Deployment | Render (API) + Vercel (Admin) |
 
 ---
 
@@ -196,7 +187,7 @@ cd ../admin && npm install
 ```env
 PORT=3000
 FRONTEND_URL=http://localhost:5173
-MONGODB_URI=mongodb://localhost:27017/weatherguard
+MONGODB_URI=mongodb+srv://...
 JWT_SECRET=your_super_secret_key
 JWT_EXPIRES_IN=7d
 
@@ -210,7 +201,7 @@ GITHUB_CALLBACK_URL=http://localhost:3000/auth/github/callback
 
 TELEGRAM_BOT_TOKEN=...
 OPENWEATHER_API_KEY=...
-ADMIN_EMAIL=your@email.com        # This email gets admin role on first login
+ADMIN_EMAIL=your@email.com
 ```
 
 **`admin/.env`**:
@@ -234,22 +225,10 @@ Open http://localhost:5173
 
 ### 4. First-time setup
 
-1. Sign in with the email matching `ADMIN_EMAIL` — you'll be routed to `/admin` automatically
+1. Sign in with the email matching `ADMIN_EMAIL` — routed to `/admin` automatically
 2. Other users sign in → land on `/dashboard` with `pending` status
 3. Admin reviews requests at `/admin`, clicks **Approve**
 4. Approved users link Telegram via the dashboard button, then set city with `/setcity <city>` in the bot
-
-### 5. Deploy
-
-**API → Render**
-- Connect GitHub repo, set root to `/api`
-- Build: `npm run build`, Start: `node dist/main.js`
-- Add all env vars in Render dashboard
-
-**Admin → Vercel**
-- Connect GitHub repo, set root to `/admin`
-- Framework: Vite, Build: `npm run build`, Output: `dist`
-- Add `VITE_API_URL=https://your-api.onrender.com`
 
 ---
 
@@ -264,7 +243,7 @@ Open http://localhost:5173
 
 ## Architecture Notes
 
-**Why JWT over sessions?** Stateless — no Redis needed, scales horizontally, works cleanly across Vercel + Render.
+**Why JWT over sessions?** Stateless — no Redis needed, scales horizontally, works cleanly across any deployment.
 
 **Why node-cron over BullMQ?** The task is a simple hourly broadcast with no retry queue requirements. BullMQ adds Redis as a dependency; node-cron is sufficient and keeps the stack lighter.
 
